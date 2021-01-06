@@ -5,6 +5,7 @@ import ca.uhn.fhir.model.dstu2.resource.Patient;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.client.api.ServerValidationModeEnum;
 import ca.uhn.fhir.rest.client.interceptor.LoggingInterceptor;
+import org.hibernate.dialect.H2Dialect;
 import org.hl7.fhir.instance.model.api.IIdType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,7 +21,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
   {
     "spring.batch.job.enabled=false",
     "hapi.fhir.fhir_version=dstu2",
-    "spring.datasource.url=jdbc:h2:mem:dbr2"
+    "spring.datasource.url=jdbc:h2:mem:dbr2",
+    "lucene.heap.enabled=true"
   })
 public class ExampleServerDstu2IT {
 

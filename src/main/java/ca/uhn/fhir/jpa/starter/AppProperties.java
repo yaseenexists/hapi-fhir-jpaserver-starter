@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Map;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import org.hl7.fhir.r4.model.Bundle;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -23,7 +22,7 @@ import org.springframework.context.annotation.Configuration;
 @EnableConfigurationProperties
 public class AppProperties {
 
-  private Boolean empi_enabled = false;
+  private Boolean mdm_enabled = false;
   private Boolean allow_cascading_deletes = false;
   private Boolean allow_contains_searches = true;
   private Boolean allow_external_references = false;
@@ -32,6 +31,7 @@ public class AppProperties {
   private Boolean allow_placeholder_references = true;
   private Boolean auto_create_placeholder_reference_targets = true;
   private Boolean enable_index_missing_fields = false;
+  private Boolean enable_repository_validating_interceptor = false;
   private Boolean enforce_referential_integrity_on_delete = true;
   private Boolean enforce_referential_integrity_on_write = true;
   private Boolean etag_support_enabled = true;
@@ -90,12 +90,12 @@ public class AppProperties {
     this.partitioning = partitioning;
   }
 
-  public Boolean getEmpi_enabled() {
-    return empi_enabled;
+  public Boolean getMdm_enabled() {
+    return mdm_enabled;
   }
 
-  public void setEmpi_enabled(Boolean empi_enabled) {
-    this.empi_enabled = empi_enabled;
+  public void setMdm_enabled(Boolean empi_enabled) {
+    this.mdm_enabled = empi_enabled;
   }
 
 
@@ -244,6 +244,14 @@ public class AppProperties {
 
   public void setEnable_index_missing_fields(Boolean enable_index_missing_fields) {
     this.enable_index_missing_fields = enable_index_missing_fields;
+  }
+
+  public Boolean getEnable_repository_validating_interceptor() {
+    return enable_repository_validating_interceptor;
+  }
+
+  public void setEnable_repository_validating_interceptor(Boolean theEnable_repository_validating_interceptor) {
+    enable_repository_validating_interceptor = theEnable_repository_validating_interceptor;
   }
 
   public Boolean getEnforce_referential_integrity_on_delete() {

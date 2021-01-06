@@ -12,8 +12,12 @@ import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.client.ClientUpgradeRequest;
 import org.eclipse.jetty.websocket.client.WebSocketClient;
 import org.hl7.fhir.instance.model.api.IIdType;
-import org.hl7.fhir.r4.model.*;
+import org.hl7.fhir.r4.model.Bundle;
+import org.hl7.fhir.r4.model.Observation;
+import org.hl7.fhir.r4.model.Patient;
+import org.hl7.fhir.r4.model.Subscription;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -21,26 +25,27 @@ import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.net.URI;
-import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import static ca.uhn.fhir.util.TestUtil.waitForSize;
+import static java.util.Comparator.comparing;
 import static org.awaitility.Awaitility.await;
+import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = Application.class, properties =
   {
     "spring.batch.job.enabled=false",
     "spring.datasource.url=jdbc:h2:mem:dbr4",
+    "hapi.fhir.enable_repository_validating_interceptor=true",
     "hapi.fhir.fhir_version=r4",
     "hapi.fhir.subscription.websocket_enabled=true",
-    "hapi.fhir.empi_enabled=true",
-    //Override is currently required when using Empi as the construction of the Empi beans are ambiguous as they are constructed multiple places. This is evident when running in a spring boot environment
+    "hapi.fhir.mdm_enabled=true",
+    //Override is currently required when using MDM as the construction of the MDM beans are ambiguous as they are constructed multiple places. This is evident when running in a spring boot environment
     "spring.main.allow-bean-definition-overriding=true"
   })
 public class ExampleServerR4IT {
@@ -54,6 +59,7 @@ public class ExampleServerR4IT {
 
 
   @Test
+  @Order(0)
   void testCreateAndRead() {
 
     String methodName = "testCreateResourceConditional";
@@ -68,29 +74,26 @@ public class ExampleServerR4IT {
     Patient pt2 = ourClient.read().resource(Patient.class).withId(id).execute();
     assertEquals(methodName, pt2.getName().get(0).getFamily());
 
-    // Test EMPI
+    // Test MDM
 
-    // Wait until the EMPI message has been processed
-    await().until(() -> getPeople().size() > 0);
-    List<Person> persons = getPeople();
+    // Wait until the MDM message has been processed
+    await().until(() -> getPatients().size(), equalTo(2));
+    List<Patient> persons = getPatients();
+    Patient goldenRecord = persons.get(0);
 
-    // Verify a Person was created that links to our Patient
-    Optional<String> personLinkToCreatedPatient = persons.stream()
-      .map(Person::getLink)
-      .flatMap(Collection::stream)
-      .map(Person.PersonLinkComponent::getTarget)
-      .map(Reference::getReference)
-      .filter(pid -> id.toUnqualifiedVersionless().getValue().equals(pid))
-      .findAny();
-    assertTrue(personLinkToCreatedPatient.isPresent());
+    // Verify that a golden record Patient was created
+    assertNotNull(goldenRecord.getMeta().getTag("http://hapifhir.io/fhir/NamingSystem/mdm-record-status", "GOLDEN_RECORD"));
   }
 
-  private List<Person> getPeople() {
-    Bundle bundle = ourClient.search().forResource(Person.class).cacheControl(new CacheControlDirective().setNoCache(true)).returnBundle(Bundle.class).execute();
-    return BundleUtil.toListOfResourcesOfType(ourCtx, bundle, Person.class);
+  private List<Patient> getPatients() {
+    Bundle bundle = ourClient.search().forResource(Patient.class).cacheControl(new CacheControlDirective().setNoCache(true)).returnBundle(Bundle.class).execute();
+    List<Patient> retVal = BundleUtil.toListOfResourcesOfType(ourCtx, bundle, Patient.class);
+    retVal.sort(comparing(o -> ((Patient) o).getMeta().getLastUpdated()).reversed());
+    return retVal;
   }
 
   @Test
+  @Order(1)
   public void testWebsocketSubscription() throws Exception {
     /*
      * Create subscription
