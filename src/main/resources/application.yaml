@@ -1,10 +1,13 @@
 spring:
   datasource:
-    url: 'jdbc:h2:file:./target/database/h2'
+    url: 'jdbc:mysql://localhost:3306/hapi_dstu3'
+    #url: 'jdbc:h2:file:./target/database/h2'
     #url: jdbc:h2:mem:test_mem
-    username: sa
-    password: null
-    driverClassName: org.h2.Driver
+    username: root
+    password: root
+    #username: sa
+    #password: null
+    driverClassName: com.mysql.jdbc.Driver
     max-active: 15
   jpa:
     properties:
