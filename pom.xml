@@ -326,8 +326,8 @@
             </plugins>
         </pluginManagement>
 
-        <!-- Tells Maven to name the generated WAR file as ROOT.war -->
-        <finalName>ROOT</finalName>
+        <!-- Tells Maven to name the generated WAR file as hapi-fhir-jpaserver-starter.war -->
+        <finalName>hapi-fhir-jpaserver-starter</finalName>
 
         <plugins>
             <plugin>
