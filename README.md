@@ -17,7 +17,8 @@ In order to use this sample, you should have:
 
 ### Creating the mySQL database
 With mySQL server installed, create a database (you will have to use a Admin role for this)  
-```CREATE DATABASE hapi_dstu3;
+```bash
+CREATE DATABASE hapi_dstu3;
 ```
 
 ### Using Spring Boot with :run
@@ -56,7 +57,8 @@ This will create a file called `hapi-fhir-jpaserver-starter.war` in your `target
 
 ### Creating the mySQL database
 With mySQL server installed, create a database by running (you will have to use a Admin role for this) 
-```CREATE DATABASE hapi_dstu3;
+```bash
+CREATE DATABASE hapi_dstu3;
 ```
 
 ### Configurations 
