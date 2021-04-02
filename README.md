@@ -43,7 +43,15 @@ Several template files that can be customized are found in the following directo
 
 ## Deploying to an Application Server
 
-To deploy to a server
+In order to use this sample, you should have:
+
+- [This project](https://github.com/yaseenexists/hapi-fhir-jpaserver-starter) cloned and check out the develop branch.
+
+### and 
+ - Oracle Java (JDK) installed: Minimum JDK8 or newer.
+ - Apache Tomcat server (or a server of your choice). 
+ - Apache Maven build tool (newest version). 
+ - mySQL 5.5 server.  
 
 ### Build the war file
 
